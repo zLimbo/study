@@ -1,4 +1,4 @@
-#### [44. 通配符匹配](https://leetcode-cn.com/problems/wildcard-matching/)
+#### [[hard]44. 通配符匹配](https://leetcode-cn.com/problems/wildcard-matching/)
 
 > 给定一个字符串 (s) 和一个字符模式 (p) ，实现一个支持 '?' 和 '*' 的通配符匹配。
 >
