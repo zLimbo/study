@@ -28,7 +28,7 @@
 ```cpp
 // cpp
 // string
-// 字典树(Trie)
+// 字典树(Trie) + 动态规划
 
 struct Trie {
     Trie* next[26] = { nullptr };
@@ -79,5 +79,120 @@ public:
         return dp[n];
     }
 };
+```
+
+
+
+```cpp
+// cpp
+// string
+// 字符串哈希
+
+class Solution {
+public:
+    using LL = long long;
+    static constexpr LL P = (1LL << 31) - 1;
+    static constexpr LL BASE = 41;
+
+    LL getHash(const string& s) {
+        LL hashValue = 0;
+        for (int i = s.length()-1; i >= 0; --i) {
+            hashValue = hashValue * BASE + s[i] - 'a' + 1;
+            hashValue %= P;
+        }
+        return hashValue;
+    }
+
+    int respace(vector<string>& dictionary, string sentence) {
+        unordered_set<LL> hd;
+        int maxLen = 0;
+        for (const string& word: dictionary) {
+            hd.insert(getHash(word));
+            if (word.length() > maxLen)  maxLen = word.length();
+        }
+        int n = sentence.length();
+        vector<int> dp(n+1); 
+        dp[0] = 0;
+        
+        for (int i = 1; i <= n; ++i) {
+            dp[i] = dp[i-1] + 1;
+            LL hashValue = 0;
+            for (int j = i - 1; j >= 0 && i - j <= maxLen; --j) {
+                hashValue = hashValue * BASE + sentence[j] - 'a' + 1;
+                hashValue %= P;
+                if (hd.find(hashValue) != hd.end()) {
+                    dp[i] = min(dp[i], dp[j]);
+                }
+            }
+        }
+
+        return dp[n];
+    }
+};
+```
+
+
+
+```python
+# python3
+# string
+# 字典树
+
+class Trie:
+    def __init__(self):
+        self.next = [None for _ in range(26)]
+        self.isEnd = False
+
+    def insert(self, s):
+        cur = self
+        for c in reversed(s):
+            o = ord(c) - ord('a')
+            if not cur.next[o]:
+                cur.next[o] = Trie()
+            cur = cur.next[o]
+        cur.isEnd = True
+
+class Solution:
+    def respace(self, dictionary: List[str], sentence: str) -> int:
+        trie = Trie()
+        for word in dictionary:
+            trie.insert(word)
+        n = len(sentence)
+        dp = [0 for _ in range(n+1)]
+        for i in range(1, n+1):
+            dp[i] = dp[i-1] + 1
+            cur = trie
+            for j in range(i-1, -1, -1):
+                o = ord(sentence[j]) - ord('a')
+                if not cur.next[o]:
+                    break
+                cur = cur.next[o]
+                if cur.isEnd:
+                    dp[i] = min(dp[i], dp[j])
+                if (dp[i] == 0):
+                    break
+        return dp[n]
+```
+
+
+
+```python
+# python3
+# string
+# dp
+
+class Solution:
+    def respace(self, dictionary: List[str], sentence: str) -> int:
+        if not dictionary:
+            return len(sentence)
+        dic = {*dictionary}
+        n = len(sentence)
+        dp = [0] * (n + 1)
+        for i in range(1, n + 1):
+            dp[i] = dp[i - 1] + 1
+            for j in range(i):
+                if sentence[j: i] in dic:
+                    dp[i] = min(dp[i], dp[j])
+        return dp[-1]
 ```
 
