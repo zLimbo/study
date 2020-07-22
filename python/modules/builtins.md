@@ -81,3 +81,13 @@ class filter(object)
  |  is true. If function is None, return the items that are true.
 ```
 
+#### `callable`
+
+```python
+callable(obj, /)
+    Return whether the object is callable (i.e., some kind of function).
+
+    Note that classes are callable, as are instances of classes with a
+    __call__() method.
+```
+

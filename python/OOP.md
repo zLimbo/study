@@ -173,3 +173,342 @@
 >         return self._width * self._height
 > ```
 
+#### 多重继承
+
+> - `MixIn`：在主线单一继承外的额外功能继承功能，如：
+>
+>   编写一个多进程的TCP服务:
+>
+>   ```python
+>   class MyTCPServer(TCPServer, ForkingMixIn):
+>       pass
+>   ```
+>
+>   编写一个多线程模式的UDP服务，定义如下：
+>
+>   ```python
+>   class MyUDPServer(UDPServer, ThreadMinIn):
+>       passs
+>   ```
+>
+>   编写一个协程模型：
+>
+>   ```python
+>   class MyTCPServer(TCPServer, CoroutinMixIn):
+>       pass
+>   ```
+
+#### 定制类
+
+> 特殊用途的 `__xxx__` 属性
+>
+> - `__slots__` 限定类属性
+>
+> - `__len__()` 让类作用于 `len()` 函数
+>
+> - `__str__()` 让类作用于 `str()` 函数，也是`print()`后的内容
+>
+> - `__repr__()` 返回程序开*+发者能看到的字符串，服务于调试
+>
+> - `__iter__()` 让类作用于`for ... in ..`循环，该方法返回一个迭代对象，`for`循环会不断调用该迭代对象的`__next__()`方法拿到下一个值，直至遇到`StopIteration`异常退出循环。
+>
+>   ```python
+>   class Fib(object):
+>   
+>       def __init__(self, n):
+>           self.__n = n
+>           self.__a = 0
+>           self.__b = 1
+>           self.__cur = 0
+>   
+>       def __iter__(self):
+>           return self
+>   
+>       def __next__(self):
+>           if self.__cur >= self.__n:
+>               raise StopIteration
+>           self.__cur += 1
+>           ret = self.__a
+>           self.__a, self.__b = self.__b, self.__a + self.__b
+>           return ret
+>       
+>       def __len__(self):
+>           return self.__n - self.__cur
+>           
+>       def __str__(self):
+>           return 'The first %d Fibonacci Numbers.' % self.__n
+>           
+>       __repr__ = __str__
+>       
+>   fib = Fib(10)
+>   print(fib)
+>   print(repr(fib))
+>   for i in fib:
+>       print(i)
+>   ```
+>
+>   
+>
+> - `__getitem__()`  让类能通过`[]`获取元素
+>
+> - `__getattr__()` 在类未找到相关属性时，就会调用该函数。利用这个方法可将类的属性和方法动态化处理，如链式调用：
+>
+>   ```python
+>   class Chain(object):
+>       
+>       def __init__(self, path=''):
+>           self._path = path
+>           
+>       def __getattr__(self, path):
+>           return Chain('%s/%s' % (self._path, path))
+>       
+>       def __call__(self, path):
+>           return Chain('%s/%s' % (self._path, path))
+>       
+>       def __str__(self):
+>           return self._path
+>       
+>       __repr__ = __str__
+>       
+>   print(Chain().status.user.timeline.list)
+>   # /status/user/timeline/list
+>   print(Chain().user('zlimbo').repos)
+>   # /user/zlimbo/repos
+>   ```
+>
+> - `__call__()` 可对实例进行调用
+>
+>   ```python
+>   class Fib(object):
+>       def __call__(self, n):
+>           a, b = 0, 1
+>           while n > 0:
+>               a, b = b, a + b
+>               n -= 1
+>           return a
+>       
+>   fib = Fib()
+>   print(callable(fib))  # True
+>   print(fib(10))
+>   ```
+
+#### `enum`(枚举类)
+
+> ```python
+> from enum import Enum
+> 
+> Month = Enum('Month', ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'))
+> 
+> for name, member in Month.__members__.items():
+>     print(name, '=>', member, ',', member.value)
+> ```
+>
+> `value`属性是自动赋给成员的`int`常量，默认从1开始计数
+>
+> 可从`Enum`派生出自定义类：
+>
+> ```python
+> from enum import Enum, unique
+> 
+> @unique
+> class Weekday(Enum):
+>     Sun = 0
+>     Mon = 1
+>     Tue = 2
+>     Wed = 3
+>     Thu = 4
+>     Fri = 5
+>     Sat = 6
+> ```
+>
+> `@unique`装饰器检查有无重复值
+>
+> 访问：
+>
+> ```python
+> Weekday.Mon
+> Weekday['Tue']
+> Weekday.Wed.value
+> Weekday(4)
+> Weekday.__members__
+> ```
+>
+> `Enum` 把一组相关常量定义在一个`class`中，且`class`不可变，且成员间可以比较
+
+#### 动态创建类
+
+> - `type(object_or_name, bases, dict)` 
+>
+>   ```python
+>   def fn(self, name='world'):
+>       print('Hello, %s' % name)
+>   
+>   Hello = type('Hello', (object,), dict(hello=fn))
+>   print(type(Hello)) 
+>   # <class 'type'>
+>   ```
+>
+>   通过`type()`函数创建的类和直接写`class`是完全一样的，因为`Python`解释器遇到`class`定义时，仅仅是扫描`class`定义的语法，然后调用`type()`函数创建出`class`。
+>
+> - `metaclass` （元类）
+>
+>   元类是类的定义模板，可以创建类或修改类。其实是`type`的派生类，重新定义创建规则。
+>
+>   ```python
+>   class TestMixin(object):
+>       def test(self):
+>           print('This is TestMixin.test')
+>   
+>   class ListMetaclass(type):
+>       def __new__(cls, name, bases, attrs):
+>           print('This is ListMetaclass.__new__')
+>           print("cls:", str(cls))
+>           print("name:", str(name))
+>           print("bases:", str(bases))
+>           print("attrs:", str(attrs))
+>           attrs['add'] = lambda self, value: self.append(value)
+>           return type.__new__(cls, name, bases, attrs)
+>       
+>   class MyList(list, TestMixin, metaclass=ListMetaclass):
+>       def __init__(self):
+>           print('This is MyList.__init__')
+>   
+>   L = MyList()
+>   L.add(1)	# 普通的list没有add方法
+>   print(L)
+>   L.test()
+>   ```
+>
+>   ```shell
+>   # 输出为：
+>   This is ListMetaclass.__new__
+>   cls: <class '__main__.ListMetaclass'>
+>   name: MyList
+>   bases: (<class 'list'>, <class '__main__.TestMixin'>)
+>   attrs: {'__module__': '__main__', '__qualname__': 'MyList', '__init__': <function MyList.__init__ at 0x00000247165A1820>}
+>   This is MyList.__init__
+>   [1]
+>   This is TestMixin.test
+>   ```
+>
+>   当类继承参数传入关键词参数`metaclass`时，它指示`Python`解释器在创建`MyList`时，就通过`ListMetaclass.__new__()`来创建。
+>
+>   `__new__()`方法接受的参数依次为：元类名称；类的名字；类继承的集合；类的方法集合。
+>
+>   **元类应用**
+>
+>   `ORM` （Object Relational Mapping，对象关系映射），即把关系数据库的一行映射为一个对象，一个类对应一个表，便于代码编写而无须`SQL`语句。编写一个`ORM`框架，所有的类只能动态定义，因为只有使用者才能根据表的结构定义对应的类。
+>
+>   ```python
+>   # User表到User类的映射
+>   class User(Model):
+>       #定义类的属性到列的映射
+>       id = IntegerField('id')
+>       name = StringField('username')
+>       email = StringField('email')
+>       password = StringField('password')
+>       
+>   # 创建一个实例
+>   user = User(id=1234, name='test', email='test@orm.org', password='testpwd')
+>   # 保存到数据库
+>   user.save()
+>   ```
+>
+>   父类`Model`和属性`StringField`, `IntegerField` 由`ORM`框架提供，其他的魔术方法如`save()`全部由`metaclass`自动完成。
+>
+>   一个简单的`ORM`实现如下：
+>
+>   ```python
+>   # 先定义Field类
+>   class Field(object):
+>       """Field类负责保存数据库表的字段名和字段类型"""
+>   
+>       def __init__(self, name, column_type):
+>           self.name = name
+>           self.column_type = column_type
+>           
+>       def __str__(self):
+>           return '<%s:%s>' % (self.__class__.__name__, self.name)
+>   
+>   # 再派生各种类型的Field类
+>   class StringField(Field):
+>   
+>       def __init__(self, name):
+>           super(StringField, self).__init__(name, 'varchar(100)')
+>   
+>   class IntegerField(Field):
+>   
+>       def __init__(self, name):
+>           super(IntegerField, self).__init__(name, 'bigint')
+>   
+>   # 元类 ModelMetaclass类
+>   class ModelMetaclass(type):
+>   
+>       def __new__(cls, name, bases, attrs):
+>           if name == 'Model':
+>               return type.__new__(cls, name, bases, attrs)
+>           print('Found model: %s' % name)
+>           mappings = dict()
+>           for k, v in attrs.items():
+>               if isinstance(v, Field):
+>                   print('Found mapping: %s ==> %s' % (k, v))
+>                   mappings[k] = v
+>           attrs.clear()
+>           attrs['__mappings__'] = mappings # 保存属性和列的映射关系
+>           attrs['__table__'] = name
+>           return type.__new__(cls, name, bases, attrs)
+>   
+>   # 基类 Model
+>   class Model(dict, metaclass=ModelMetaclass):
+>   
+>       def __init__(self, **kw):
+>           super(Model, self).__init__(**kw)
+>   
+>       def __getattr__(self, key):
+>           try:
+>               return self[key]
+>           except KeyError:
+>               raise AttributeError(r"'Model' object has no attribte '%s'" % key)
+>   
+>       def __setattr__(self, key, value):
+>           slef[key] = value
+>   
+>       def save(self):
+>           fields = []
+>           params = []
+>           args = []
+>           for k, v in self.__mappings__.items():
+>               fields.append(v.name)
+>               params.append('?')
+>               args.append(getattr(self, k, None))
+>           sql = 'INSERT INTO %s (%s) VALUES (%s)' % (self.__table__, ','.join(fields), ','.join(params))
+>           print('SQL: %s' % sql)
+>           print('FIELDS: %s' % str(fields))
+>           print('ARGS: %s' % str(args))
+>   
+>   # User表到User类的映射，User类自动继承基类的元类
+>   class User(Model):
+>       #定义类的属性到列的映射
+>       id = IntegerField('id')
+>       name = StringField('username')
+>       email = StringField('email')
+>       password = StringField('password')
+>       
+>   # 创建一个实例
+>   user = User(id=1234, name='test', email='test@orm.org', password='testpwd')
+>   # 保存到数据库
+>   user.save()
+>   ```
+>
+>   ```python
+>   # 输出
+>   Found model: User
+>   Found mapping: id ==> <IntegerField:id>
+>   Found mapping: name ==> <StringField:username>
+>   Found mapping: email ==> <StringField:email>
+>   Found mapping: password ==> <StringField:password>
+>   SQL: INSERT INTO User (id,username,email,password) VALUES (?,?,?,?)
+>   FIELDS: ['id', 'username', 'email', 'password']
+>   ARGS: [1234, 'test', 'test@orm.org', 'testpwd']
+>   ```
+
