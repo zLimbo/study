@@ -26,6 +26,9 @@
 | getppid()                                | 当前父进程id                                                 |
 | waitpid(pid, options)                    | 等待某个进程结束（Windows忽略options）                       |
 | kill(pid, signal)                        | 杀进程                                                       |
+| name                                     | 'posix'(Linux, Unix or Mac OS X) or 'nt'(Windows)            |
+| uname                                    | 详细系统信息（Windows不提供）                                |
+| environ                                  | 所有环境变量                                                 |
 
 
 #### os.path
@@ -37,7 +40,7 @@
 | commonprefix(list)          | 返回多个路径的公共最长路径                 |
 | dirname(path)               | 返回文件路径                               |
 | exists(path)                | 判定路径存在与否                           |
-| expanduser(path)            | 将“~”和“~user”转换为用户目录               |
+| expanduser(path)            | 将`~`和`~user`转换为用户目录               |
 | getatime(path)              | 最近访问时间(浮点型秒数)                   |
 | getmtime(path)              | 最近修改时间                               |
 | getctime(path)              | 创建时间                                   |
