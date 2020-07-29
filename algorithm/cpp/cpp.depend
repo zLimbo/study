@@ -1,0 +1,20 @@
+# depslib dependency file v1.0
+1595935945 source:f:\0_zlimbo\study\algorithm\cpp\main.cpp
+	<iostream>
+	"BinarySearchTree.hpp"
+	<stdlib.h>
+	<assert.h>
+
+1595937607 f:\0_zlimbo\study\algorithm\cpp\binarysearchtree.hpp
+	<utility>
+	<vector>
+	<stack>
+	<queue>
+	"BinaryTree.hpp"
+
+1595937494 f:\0_zlimbo\study\algorithm\cpp\binarytree.hpp
+	<utility>
+	<vector>
+	<stack>
+	<queue>
+
