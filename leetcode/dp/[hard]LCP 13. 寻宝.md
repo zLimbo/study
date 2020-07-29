@@ -61,7 +61,7 @@
 
 ```cpp
 // cpp
-// dp状态压缩动态规划模型
+// BFS，多源最短路径，状态压缩动态规划
 
 class Solution {
 public:
@@ -199,5 +199,95 @@ public:
         return ans;
     }
 };
+```
+
+
+
+```python
+# python3
+# BFS，多源最短路径，状态压缩动态规划
+
+class Solution:
+    def minimalSteps(self, maze: List[str]) -> int:
+        n, m = len(maze), len(maze[0])
+        add = ((-1, 0), (1, 0), (0, -1), (0, 1))
+        inBound = lambda x, y: 0 <= x < n and 0 <= y < m
+
+        def bfs(x, y):
+            ret = [[-1] * m for _ in range(n)]
+            ret[x][y] = 0
+            Q = collections.deque()
+            Q.append((x, y));
+            while Q:
+                x, y = Q.popleft()
+                for dx, dy in add:
+                    nx, ny = x + dx, y + dy
+                    if inBound(nx, ny) and maze[nx][ny] != '#' and ret[nx][ny] == -1:
+                        ret[nx][ny] = ret[x][y] + 1
+                        Q.append((nx, ny))
+            return ret
+
+        M, O = [], []
+        sx, sy, tx, ty = 0, 0, 0, 0
+        for i in range(n):
+            for j in range(m):
+                c = maze[i][j]
+                if c == 'O':
+                    O.append((i, j))
+                elif c == 'M':
+                    M.append((i, j))
+                elif c == 'S':
+                    sx, sy = i, j
+                elif c == 'T':
+                    tx, ty = i, j
+        nm, no = len(M), len(O)
+        start_dist = bfs(sx, sy)
+        if nm == 0:
+            return start_dist[tx][ty]
+        mm_dist = [[-1] * nm for _ in range(nm)] # 机关与机关之间经过石头的最短距离
+        sm_dist = [] # 起点与机关间经过石头的距离
+        mt_dist = [] # 机关与终点间的距离（不经过石头）
+        dd = []
+        for x, y in M:
+            d = bfs(x, y)
+            if d[tx][ty] == -1:
+                return -1
+            mt_dist.append(d[tx][ty])
+            dd.append(d)
+        for i in range(nm):
+            for j in range(i+1, nm):
+                mn = -1
+                for x, y in O:
+                    di, dj = dd[i][x][y], dd[j][x][y]
+                    if di != -1 and dj != -1:
+                        if mn == -1 or mn > di + dj:
+                            mn = di + dj
+                mm_dist[i][j] = mm_dist[j][i] = mn
+            mn = -1
+            for x, y in O:
+                di, ds = dd[i][x][y], start_dist[x][y]
+                if di != -1 and ds != -1:
+                    if mn == -1 or mn > di + ds:
+                        mn = di + ds
+            if mn == -1:
+                return -1
+            sm_dist.append(mn)
+        dp = [[-1] * nm for _ in range(1 << nm)]
+        for i in range(nm):
+            dp[1 << i][i] = sm_dist[i]
+        for mask in range(1, 1 << nm):
+            for i in range(nm):
+                if mask & (1 << i):
+                    for j in range(nm):
+                        if not mask & (1 << j):
+                            newMask = mask | (1 << j)
+                            if dp[newMask][j] == -1 or dp[newMask][j] > dp[mask][i] + mm_dist[i][j]:
+                                dp[newMask][j] = dp[mask][i] + mm_dist[i][j]
+        finalMask = (1 << nm) - 1
+        ans = -1
+        for i in range(nm):
+            if ans == -1 or ans > dp[finalMask][i] + mt_dist[i]:
+                ans = dp[finalMask][i] + mt_dist[i]
+        return ans
 ```
 
