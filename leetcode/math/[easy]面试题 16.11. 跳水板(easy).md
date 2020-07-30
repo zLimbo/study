@@ -38,9 +38,10 @@ public:
         vector<int> ans(k+1);
         
         int temp = shorter * k;
+        int add = longer - shorter + ;
         for (int i = 0; i <= k; ++i) {
             ans[i] = temp;
-            temp = temp - shorter + longer;
+            temp = temp + add;
         }
 
         return ans;

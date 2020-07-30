@@ -194,3 +194,57 @@
 - 操作文件和目录
 
   > 复制文件并非由操作系统提供的系统调用
+  >
+  > 详见os模块
+  
+  ```python
+  # 在某目录下查找含有字符的文件
+  import os
+  import sys
+  
+  def find(path, s):
+      for basename in os.listdir(path):
+          p = os.path.join(path, basename)
+          if os.path.isdir(p):
+              find(p, s)
+          elif s in basename:
+              print(os.path.relpath(p, '.'))
+  
+  def find2(path, s):
+      for dirpath, dirnames, filenames in os.walk(path):
+          for filename in filenames:
+              if s in filename:
+                  abspath = os.path.join(dirpath, filename)
+                  relpath = os.path.relpath(abspath, '.')
+                  yield relpath
+  
+  if __name__ == '__main__':
+      path, s = sys.argv[1], sys.argv[2]
+      print('find {} in {}:'.format(s, path))
+      for path in find2(path, s):
+          print(path)
+  ```
+  
+  ```python
+  # ls -l
+  import os
+  import sys
+  import time
+  
+  def ls(path):
+      files = os.listdir(path)
+      for file in files:
+          p = os.path.join(path, file)
+          t = os.path.getmtime(p)
+          t_str = time.strftime('%m月 %d %H:%M ', time.localtime(t)) + file
+          if os.path.isdir(p):
+              t_str += '/'
+          print(t_str)
+  
+  if __name__ == '__main__':
+      path = sys.argv[1]
+      ls(path)
+  ```
+  
+  
+
