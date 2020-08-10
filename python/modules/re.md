@@ -81,6 +81,24 @@ findall(pattern, string, flags=0)
     Empty matches are included in the result.
 ```
 
+```python
+In [971]: with open('test/py/test_decorator.py') as f:      
+     ...:     words = re.findall(r'\w+', f.read().lower())  
+     ...: Counter(words).most_common(10)                    
+     ...:                                                   
+Out[971]:                                                   
+[('print', 4),                                              
+ ('def', 3),                                                
+ ('func', 3),                                               
+ ('return', 3),                                             
+ ('test', 3),                                               
+ ('functools', 2),                                          
+ ('log', 2),                                                
+ ('wrapper', 2),                                            
+ ('args', 2),                                               
+ ('kw', 2)]                                                 
+```
+
 
 
 #### re.finditer
