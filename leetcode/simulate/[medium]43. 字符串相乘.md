@@ -82,3 +82,36 @@ class Solution:
         return ''.join(prod[start:])
 ```
 
+
+
+#### itertools.chain
+
+```python
+class chain(builtins.object)
+ |  chain(*iterables) --> chain object
+ |
+ |  Return a chain object whose .__next__() method returns elements from the
+ |  first iterable until it is exhausted, then elements from the next
+ |  iterable, until all of the iterables are exhausted.
+```
+
+
+
+#### itertools.groupby
+
+```python
+class groupby(builtins.object)
+ |  groupby(iterable, key=None)
+ |
+ |  make an iterator that returns consecutive keys and groups from the iterable
+ |
+ |  iterable
+ |    Elements to divide into groups according to the key function.
+ |  key
+ |    A function for computing the group category for each element.
+ |    If the key function is not specified or is None, the element itself
+ |    is used for grouping.
+```
+
+
+
