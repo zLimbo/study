@@ -46,7 +46,7 @@
 
 ```cpp
 // cpp
-// dp
+// 前缀和
 
 class Solution {
 public:
@@ -67,5 +67,28 @@ public:
         return int(ans % mod);
     }
 };
+```
+
+
+
+```python
+# python3
+# 前缀和
+
+class Solution:
+    def numOfSubarrays(self, arr: List[int]) -> int:
+        MOD = 10**9 + 7
+        odd, even = 0, 1
+        res = 0
+        s = 0
+        for x in arr:
+            s += x
+            if s & 1:
+                res += even
+                odd += 1
+            else:
+                res += odd
+                even += 1
+        return res % MOD
 ```
 

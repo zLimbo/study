@@ -79,3 +79,34 @@ public:
 };
 ```
 
+
+
+```python
+# python3
+# 前缀和
+
+class Solution:
+    def numSplits(self, s: str) -> int:
+        n = len(s)
+        left, right = [0] * (n + 1), [0] * (n + 1)
+        ls, rs = set(), set()
+
+        for i in range(n):
+            lc, rc = s[i], s[n - i - 1]
+            if lc in ls:
+                left[i + 1] = left[i]
+            else:
+                left[i + 1] = left[i] + 1
+                ls.add(lc)
+            if rc in rs:
+                right[i + 1] = right[i]
+            else:
+                right[i + 1] = right[i] + 1
+                rs.add(rc)
+        ans = 0
+        for i in range(1, n):
+            if left[i] == right[n - i]:
+                ans += 1
+        return ans
+```
+

@@ -71,3 +71,26 @@ public:
 };
 ```
 
+
+
+```cpp
+// cpp
+// kmp
+
+class Solution {
+public:
+    bool repeatedSubstringPattern(string s) {
+        int n = s.size();
+        vector<int> fail(n, -1);
+        for (int i = 1; i < n; ++i) {
+            int j = fail[i - 1];
+            while (j != -1 && s[i] != s[j + 1]) {
+                j = fail[j];
+            }
+            if (s[i] == s[j + 1]) fail[i] = j + 1;
+        }
+        return fail[n - 1] != -1 && n % (n - 1 - fail[n - 1]) == 0;
+    }
+};
+```
+
