@@ -80,16 +80,38 @@ public:
 class Solution {
 public:
     bool repeatedSubstringPattern(string s) {
-        int n = s.size();
-        vector<int> fail(n, -1);
-        for (int i = 1; i < n; ++i) {
-            int j = fail[i - 1];
-            while (j != -1 && s[i] != s[j + 1]) {
-                j = fail[j];
+        string s2 = s + s;
+        return kmp(s2, s, 1) != s.size();
+    }
+
+    int kmp(const string& s, const string& t, int start = 0) {
+        int sLen = s.size(), tLen = t.size();
+
+        vector<int> next(tLen);
+        next[0] = -1;
+        int i = 0, j = -1;
+        while (i + 1 < tLen) {
+            if (j == -1 || t[i] == t[j]) {
+                next[++i] = ++j;
+                //while (next[i] != -1 && s[i] == s[next[i]]) 
+                //    next[i] = next[next[i]];
+            } else {
+                j = next[j];
             }
-            if (s[i] == s[j + 1]) fail[i] = j + 1;
         }
-        return fail[n - 1] != -1 && n % (n - 1 - fail[n - 1]) == 0;
+        //for (int x: next) cout << x << " "; cout << endl;
+
+        i = start, j = 0;
+        while (i < sLen && j < tLen) {
+            if (j == -1 || s[i] == t[j]) {
+                // cout << i << " " << j << endl;
+                ++i; ++j;
+            } else {
+                j = next[j];
+            }
+        }
+        // cout << i << " " << j << endl;
+        return j == tLen ? i - tLen : -1;
     }
 };
 ```
