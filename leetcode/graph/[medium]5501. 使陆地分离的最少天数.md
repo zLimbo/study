@@ -56,6 +56,7 @@
 ```cpp
 // cpp
 // dfs
+// O((nm)^3)
 
 class Solution {
 public:
@@ -100,6 +101,104 @@ public:
             }
         }
         return 2;
+    }
+};
+```
+
+
+
+```cpp
+// cpp
+// 并查集 + Tarjan 找割点算法
+// O(nm)
+
+const int dx[4] = {0, 0, 1, -1};
+const int dy[4] = {1, -1, 0, 0};
+
+class Solution {
+public:
+
+    vector<int> ufs, ufs_size;
+    vector<int> dfn, low;
+    vector<vector<int>> adj;
+    int time;
+
+    // 并查集 
+    int ufs_find(int u) {
+        return ufs[u] == u ? u : ufs[u] = ufs_find(ufs[u]);
+    }
+
+    void ufs_connect(int u, int v) {
+        int p = ufs_find(u), q = ufs_find(v);
+        if (p == q) return;
+        if (ufs_size[p] < ufs_size[q]) {
+            ufs[p] = q;
+            ufs_size[q] += ufs_size[p];
+        } else {
+            ufs[q] = p;
+            ufs_size[p] += ufs_size[q];
+        }
+    }
+
+    // tarjan 找割点
+    bool tarjan(int u, int p) {
+        dfn[u] = low[u] = ++time;
+        int child_num = 0;
+        for (int v: adj[u]) {
+            if (!dfn[v]) {
+                ++child_num;
+                if ((p == -1 && child_num > 1) 
+                    	|| tarjan(v, u) 
+                    	|| (p != -1 && low[v] >= dfn[u])) {
+                    return true;
+                }
+                low[u] = min(low[u], low[v]);
+            } else if (v != p) {
+                low[u] = min(low[u], low[v]);
+            }
+        }
+        return false;
+    }
+
+    int minDays(vector<vector<int>>& grid) {
+        int n = grid.size(), m = grid[0].size();
+        int N = m * n;
+        adj = vector<vector<int>>(N);
+        ufs = vector<int>(N, -1);
+        ufs_size = vector<int>(N, 1);
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                if (!grid[i][j]) continue;
+                int u = i * m + j;
+                if (ufs[u] == -1) ufs[u] = u;
+                for (int k = 0; k < 4; ++k) {
+                    int ni = i + dx[k], nj = j + dy[k];
+                    if (ni < 0 || ni >= n || nj < 0 || nj >= m || !grid[ni][nj]) {
+                        continue;
+                    }
+                    int v = ni * m + nj;
+                    if (ufs[v] == -1) ufs[v] = v;
+                    ufs_connect(u, v);
+                    adj[u].push_back(v);
+                }
+            }
+        }
+        int set_num = 0;
+        for (int i = 0; i < N; ++i) {
+            if (ufs[i] != -1 && i == ufs_find(i)) {
+                if (++set_num > 1) return 0;
+            }
+        }
+        if (set_num == 0) return 0;
+        for (int i = 0; i < N; ++i) {
+            if (ufs[i] != -1) {
+                dfn = vector<int>(N);
+                low = vector<int>(N);
+                time = 0;
+                return tarjan(i, -1) ? 1 : 2;
+            }
+        }
+        return 0;
     }
 };
 ```

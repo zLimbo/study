@@ -1,3 +1,4 @@
+
 #ifndef __BINARY_TREE__HPP__
 #define __BINARY_TREE__HPP__
 
@@ -6,9 +7,12 @@
 #include <vector>
 #include <stack>
 #include <queue>
+#include <string>
 
 using std::cout;
 using std::endl;
+using std::string;
+using std::to_string;
 
 namespace zLimbo {
 
@@ -25,10 +29,12 @@ struct TreeNode {
     explicit TreeNode(
             T val,
             TreeNode* parent = nullptr,
-            TreeNode* left=nullptr,
-            TreeNode* right=nullptr):
+            TreeNode* left = nullptr,
+            TreeNode* right = nullptr):
         val(val), parent(parent), left(left), right(right) {}
 };
+
+
 
 
 template <typename T>
@@ -45,6 +51,7 @@ protected:
 
 protected:
     void removeTree(TreeNode<T>* tn);
+    void showTree(TreeNode<T>* tn, string prefix = "", bool isLeft = true) const;
 
 public:
     unsigned size() const { return _size; };
@@ -77,6 +84,7 @@ template <typename T>
 BinaryTree<T>::~BinaryTree() {
     removeTree(root);
     root = nullptr;
+    cout << "free" << endl;
 }
 
 
@@ -144,6 +152,28 @@ std::vector<T> BinaryTree<T>::level() const {
     return data;
 }
 
+template <typename T>
+void BinaryTree<T>::showTree() const {
+    showTree(root);
+}
+
+
+template <typename T>
+void BinaryTree<T>::showTree(TreeNode<T>* tn, string prefix, bool isLeft) const {
+    if (tn == nullptr) {
+        cout << "Empty tree" << endl;
+        return;
+    }
+    if (tn->right) {
+        showTree(tn->right, prefix + (isLeft ? "│   " : "    "), false);
+    }
+    cout << prefix + (isLeft ? "└── " : "┌── ") + to_string(tn->val) + "\n";
+    if (tn->left) {
+        showTree(tn->left, prefix + (isLeft ? "│    " : "   "), true);
+    }
+
+
+}
 
 } // namespace zLimbo
 

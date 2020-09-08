@@ -1,12 +1,17 @@
 #include <iostream>
-#include "BinarySearchTree.hpp"
 #include <stdlib.h>
 #include <assert.h>
+
+#include "mytest.h"
+#include "BinarySearchTree.hpp"
+
 using namespace std;
 using namespace zLimbo;
 
 int main()
 {
+    cout << "中国" << endl;
+
     BinarySearchTree<int> bst;
 
     for (int i = 0; i < 10; ++i) {
@@ -31,6 +36,7 @@ int main()
         cout << "vec size: " << cnt << endl;
     };
 
+    bst.showTree();
 
     inorder();
     int e = 67;

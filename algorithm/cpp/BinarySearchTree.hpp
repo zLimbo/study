@@ -13,7 +13,6 @@ using std::endl;
 
 namespace zLimbo {
 
-
 template <typename T>
 class BinarySearchTree: public BinaryTree<T> {
 
@@ -21,10 +20,8 @@ protected:
     std::pair<TreeNode<T>*, int> locate(const T& val) const;
     TreeNode<T>* last(TreeNode<T>* tn) const;
     TreeNode<T>* next(TreeNode<T>* tn) const;
-    void removeTree(TreeNode<T>* tn);
 
 public:
-    ~BinarySearchTree() { } override;
     bool search(const T& val) const override;
     bool insert(const T& val) override;
     bool remove(const T& val) override;
@@ -91,6 +88,7 @@ bool BinarySearchTree<T>::search(const T& val) const{
     std::cout << locate(val).second << "\t";
     return locate(val).second == 3;
 }
+
 
 
 template <typename T>
