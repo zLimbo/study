@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "utility": "cpp",
-        "xiosbase": "cpp",
-        "queue": "cpp",
-        "stack": "cpp",
-        "ostream": "cpp"
-    }
-}
